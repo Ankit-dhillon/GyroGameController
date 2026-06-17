@@ -1,5 +1,5 @@
 """
-Subway Surfers Physical Controller — PC Side
+GyroGaneController — PC Side
 =============================================
 Reads serial messages from Arduino and maps them to keyboard inputs.
 
@@ -14,9 +14,8 @@ Usage:
 Mappings:
     TILT:LEFT     →  Left Arrow  (change lane left)
     TILT:RIGHT    →  Right Arrow (change lane right)
-    MUSCLE:FLEX   →  Up Arrow    (jump)
-    MUSCLE:LONG   →  Down Arrow  (slide)
-    MUSCLE:DOUBLE →  Space       (hoverboard)
+    TILT:UP        →  Forward Arrow (jumps)
+    TILT:DOWN       →  Backward Arrow (slides)
 """
 
 import sys
@@ -31,9 +30,8 @@ keyboard = Controller()
 ACTION_MAP = {
     "TILT:LEFT":     Key.left,
     "TILT:RIGHT":    Key.right,
-    "MUSCLE:FLEX":   Key.up,       # jump
-    "MUSCLE:LONG":   Key.down,     # slide
-    "MUSCLE:DOUBLE": Key.space,    # hoverboard
+    "TILT:UP":   Key.up,       # jump
+    "TILT:DOWN":   Key.down,     # slide
 }
 
 # How long to hold each key (seconds)
@@ -42,7 +40,6 @@ KEY_HOLD = {
     Key.right: 0.08,
     Key.up:    0.08,
     Key.down:  0.05,
-    Key.space: 0.08,
 }
 
 # ── Serial Port Detection ─────────────────────────────────────────
@@ -73,7 +70,6 @@ KEY_LABELS = {
     Key.right: "→ RIGHT",
     Key.up:    "↑ JUMP",
     Key.down:  "↓ SLIDE",
-    Key.space: "⬛ HOVERBOARD",
 }
 
 
@@ -85,7 +81,7 @@ def main():
         print("❌  No Arduino found. Plug it in or pass port as argument.")
         sys.exit(1)
 
-    print(f"🎮  Subway Surfers Controller")
+    print(f"🎮  GyroGameController")
     print(f"📡  Connecting to {port} @ 115200 baud …")
 
     try:
@@ -131,16 +127,7 @@ def main():
                         print(f"   {line:<20} → {label}")
                         send_key(key)
                     last_tilt = direction
-                continue
-
-            # Muscle events
-            if line.startswith("MUSCLE:"):
-                key = ACTION_MAP.get(line)
-                if key:
-                    label = KEY_LABELS.get(key, str(key))
-                    print(f"   {line:<20} → {label}")
-                    send_key(key)
-                continue
+                
 
     except KeyboardInterrupt:
         print("\n👋  Controller stopped.")
